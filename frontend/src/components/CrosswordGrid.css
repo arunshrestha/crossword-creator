@@ -1,0 +1,55 @@
+.crossword-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 20px;
+    position: relative;
+}
+
+.grid {
+    display: inline-block;
+    margin: 10px;
+}
+
+.grid-row {
+    display: flex;
+}
+
+.grid-cell {
+    width: 30px;
+    height: 30px;
+    border: 1px solid gray;
+    background-color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.grid-cell.dark {
+    background-color: black;
+    color: white;
+}
+
+.grid-cell.selected {
+    background-color: lightblue;
+}
+
+.cell-options {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.cell-options button {
+    margin-bottom: 10px;
+    padding: 10px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.add-clues {
+    margin-top: 20px;
+    /* Add styles for the Add Clues section here */
+}

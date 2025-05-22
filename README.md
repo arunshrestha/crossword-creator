@@ -1,70 +1,88 @@
-# Getting Started with Create React App
+# Crossword Creator App 🧩
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A full-stack web app for building and sharing crossword puzzles using unique session IDs. Built with **React**, **Express**, and **MongoDB**.
 
-## Available Scripts
+## Features
 
-In the project directory, you can run:
+- Create custom crossword puzzles in the browser
+- Save and access puzzles with a session ID
+- REST API for puzzle management
+- Responsive and user-friendly design
 
-### `npm start`
+## Tech Stack
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- **Frontend**: React (Create React App)
+- **Backend**: Node.js, Express
+- **Database**: MongoDB (MongoDB Atlas)
+- **Deployment (planned)**:
+  - Frontend: Vercel / Netlify
+  - Backend: Render / Fly.io
+  - Database: MongoDB Atlas
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Folder Structure
 
-### `npm test`
+```plaintext
+crossword-creator/
+├── frontend/      # React app
+├── backend/       # Express server
+└── README.md      # Project overview
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Getting Started
 
-### `npm run build`
+1. Clone the repository
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+    ```bash
+    git clone https://github.com/arunshrestha/crossword-creator.git
+    cd crossword-creator
+    ```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+2. Set up environment variables
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+    Create a `.env` file in the `backend/` folder with:
 
-### `npm run eject`
+    ```env
+    PORT=5000
+    MONGO_URI=your_mongodb_connection_string
+    ```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+    Create a `.env` file in the `frontend/` folder with:
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+    ```env
+    REACT_APP_API_BASE_URL=http://localhost:5000
+    ```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+3. Install dependencies
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+    #### Frontend
 
-## Learn More
+    ```bash
+    cd frontend
+    npm install
+    ```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+    #### Backend
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+    ```bash
+    cd ../backend
+    npm install
+    ```
 
-### Code Splitting
+4. Run the app locally
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+    Open two terminals:
 
-### Analyzing the Bundle Size
+    **Terminal 1 (Frontend)**
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+    ```bash
+    cd frontend
+    npm start
+    ```
 
-### Making a Progressive Web App
+    **Terminal 2 (Backend)**
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+    ```bash
+    cd backend
+    npm run dev
+    ```
 
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+The frontend runs at [http://localhost:3000](http://localhost:3000) and connects to the backend at [http://localhost:5000](http://localhost:5000).

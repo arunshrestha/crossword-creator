@@ -20,12 +20,12 @@ A full-stack web app for building and sharing crossword puzzles using unique ses
   - Database: MongoDB Atlas
 
 ## Folder Structure
-
-```plaintext
+```
 crossword-creator/
 ├── frontend/      # React app
 ├── backend/       # Express server
 └── README.md      # Project overview
+```
 
 ## Getting Started
 

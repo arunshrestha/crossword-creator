@@ -1,37 +1,35 @@
-import React, { useState } from 'react';
-import CrosswordGrid from './components/CrosswordGrid';
-import ClueInput from './components/ClueInput';
-import './App.css';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+
+import LandingPage from './pages/LandingPage';
+import PuzzleSetupPage from './pages/PuzzleSetupPage';
+import PuzzleEditorPage from './pages/PuzzleEditorPage';
+import ClueEntryPage from './pages/ClueEntryPage';
+import PreviewPage from './pages/PreviewPage';
+import SuccessPage from './pages/SuccessPage';
+import PuzzleViewerPage from './pages/PuzzleViewerPage';
+import CompletionPage from './pages/CompletionPage';
+import NotFoundPage from './pages/NotFoundPage';
 
 function App() {
-  const [gridSize, setGridSize] = useState(5); // Default grid size
-  const [grid, setGrid] = useState(Array(5).fill(Array(5).fill({ isDark: false, value: "" })));
-  const [clues, setClues] = useState([]);
-
-  const handleGridSizeChange = (event) => {
-    const size = parseInt(event.target.value, 10);
-    setGridSize(size);
-    const newGrid = Array(size).fill(null).map(() => Array(size).fill({ isDark: false, value: "" }));
-    setGrid(newGrid);
-  };
-
   return (
-    <div className="App">
-      <h1>Crossword Creator</h1>
-      <div>
-        <label htmlFor="grid-size">Grid Size: </label>
-        <input
-          id="grid-size"
-          type="number"
-          min="2"
-          max="20"
-          value={gridSize}
-          onChange={handleGridSizeChange}
-        />
-      </div>
-      <CrosswordGrid grid={grid} setGrid={setGrid} />
-      <ClueInput grid={grid} clues={clues} setClues={setClues} />
-    </div>
+    <Router>
+      <Routes>
+        {/* Creator Flow */}
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/setup" element={<PuzzleSetupPage />} />
+        <Route path="/editor" element={<PuzzleEditorPage />} />
+        <Route path="/clues" element={<ClueEntryPage />} />
+        <Route path="/preview" element={<PreviewPage />} />
+        <Route path="/success/:id" element={<SuccessPage />} />
+
+        {/* Player Flow */}
+        <Route path="/view/:id" element={<PuzzleViewerPage />} />
+        <Route path="/complete/:id" element={<CompletionPage />} />
+
+        {/* Catch-all */}
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
+    </Router>
   );
 }
 

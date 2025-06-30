@@ -1,13 +1,15 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import Button from '../components/Shared/Button';
 
-test('renders button and handles click', () => {
-    const mockClick = jest.fn();
-    render(<Button onClick={mockClick}>Click Me</Button>);
+test('renders Button with text', () => {
+    render(<Button>Click Me</Button>);
+    const btn = screen.getByText(/click me/i);
+    expect(btn).toBeInTheDocument();
+});
 
-    const button = screen.getByText(/click me/i);
-    expect(button).toBeInTheDocument();
-
-    fireEvent.click(button);
-    expect(mockClick).toHaveBeenCalledTimes(1);
+test('calls onClick when clicked', () => {
+    const handleClick = jest.fn();
+    render(<Button onClick={handleClick}>Click</Button>);
+    fireEvent.click(screen.getByText(/click/i));
+    expect(handleClick).toHaveBeenCalledTimes(1);
 });

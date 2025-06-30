@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import Input from '../components/Shared/Input';
+import Input from '../../components/Shared/Input';
 
 describe('Input component', () => {
     test('renders with label and placeholder', () => {

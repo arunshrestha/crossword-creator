@@ -1,12 +1,40 @@
 import React from 'react';
+import GridCellHighlight from './GridCellHighlight';
 
-const GridCell = ({ row, col, value, onClick }) => {
+const GridCell = ({
+    row,
+    col,
+    value,
+    number,
+    isBlock = false,
+    onClick,
+    onMouseEnter,
+    onMouseLeave,
+    isActive,
+}) => {
+    const baseClasses = isBlock
+        ? 'bg-black'
+        : 'bg-white hover:bg-blue-100 cursor-pointer relative';
+
     return (
         <div
-            className="w-10 h-10 flex items-center justify-center border text-lg font-mono cursor-pointer bg-white hover:bg-blue-100"
-            onClick={() => onClick(row, col)}
+            data-testid={`cell-${row}-${col}`}
+            className={`w-10 h-10 flex items-center justify-center border text-lg font-mono select-none ${baseClasses}`}
+            onClick={() => !isBlock && onClick && onClick(row, col)}
+            onMouseEnter={onMouseEnter}
+            onMouseLeave={onMouseLeave}
+            role="button"
+            tabIndex={isBlock ? -1 : 0}
+            aria-label={`Cell ${row + 1}, ${col + 1}`}
         >
-            {value}
+            {!isBlock && number && (
+                <div className="absolute top-0 left-0 text-[10px] ml-1 mt-0.5 text-gray-600">
+                    {number}
+                </div>
+            )}
+            {!isBlock && value}
+
+            {!isBlock && <GridCellHighlight isActive={isActive} />}
         </div>
     );
 };

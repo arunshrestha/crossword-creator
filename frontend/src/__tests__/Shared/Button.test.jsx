@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import Button from '../components/Shared/Button';
+import Button from '../../components/Shared/Button';
 
 test('renders Button with text', () => {
     render(<Button>Click Me</Button>);

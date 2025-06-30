@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import LoadingSpinner from '../components/Shared/LoadingSpinner';
+import LoadingSpinner from '../../components/Shared/LoadingSpinner';
 
 describe('LoadingSpinner component', () => {
     test('renders spinner with default size and color', () => {

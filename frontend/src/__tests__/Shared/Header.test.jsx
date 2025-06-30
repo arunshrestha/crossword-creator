@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import Header from '../components/Shared/Header';
+import Header from '../../components/Shared/Header';
 
 describe('Header Component', () => {
     test('renders the title', () => {

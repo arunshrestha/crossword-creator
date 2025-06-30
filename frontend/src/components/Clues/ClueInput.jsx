@@ -1,24 +1,18 @@
 import React from 'react';
 
-const ClueInput = ({ number, direction, clue, answer, onChange }) => {
+const ClueInput = ({ number, direction, clue, onChange }) => {
     return (
-        <div className="mb-4">
-            <label className="block font-medium text-gray-700 mb-1">
-                {number} {direction}
+        <div className="mb-2">
+            <label className="block text-sm font-semibold mb-1">
+                {number}. {direction}
             </label>
             <input
                 type="text"
-                placeholder="Enter clue"
+                className="w-full border border-gray-300 rounded px-2 py-1"
                 value={clue}
-                onChange={(e) => onChange('clue', e.target.value)}
-                className="w-full border px-3 py-2 rounded mb-1"
-            />
-            <input
-                type="text"
-                placeholder="Enter answer"
-                value={answer}
-                onChange={(e) => onChange('answer', e.target.value)}
-                className="w-full border px-3 py-2 rounded"
+                onChange={(e) => onChange(e.target.value)}
+                placeholder={`Enter ${direction} clue`}
+                data-testid={`clue-input-${number}-${direction}`}
             />
         </div>
     );

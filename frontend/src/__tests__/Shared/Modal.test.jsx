@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import Modal from '../components/Shared/Modal';
+import Modal from '../../components/Shared/Modal';
 
 describe('Modal component', () => {
     const title = 'Test Modal';

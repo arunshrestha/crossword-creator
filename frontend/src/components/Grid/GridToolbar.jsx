@@ -1,12 +1,19 @@
 import React from 'react';
-import Button from '../Shared/Button';
 
-const GridToolbar = ({ onClear, onFill, onSymmetryToggle }) => {
+const GridToolbar = ({ onToggleSymmetry, symmetryEnabled }) => {
     return (
-        <div className="flex gap-2 mb-4">
-            <Button onClick={onClear}>Clear</Button>
-            <Button onClick={onFill}>Fill</Button>
-            <Button onClick={onSymmetryToggle}>Toggle Symmetry</Button>
+        <div className="flex space-x-4 p-2 bg-gray-100 border-b">
+            <button
+                type="button"
+                onClick={onToggleSymmetry}
+                className={`px-3 py-1 rounded ${symmetryEnabled ? 'bg-blue-500 text-white' : 'bg-gray-200'
+                    }`}
+                data-testid="symmetry-toggle-button"
+            >
+                {symmetryEnabled ? 'Symmetry On' : 'Symmetry Off'}
+            </button>
+
+            {/* Add more toolbar buttons here if needed */}
         </div>
     );
 };

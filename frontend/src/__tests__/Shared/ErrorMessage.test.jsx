@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import ErrorMessage from '../components/Shared/ErrorMessage';
+import ErrorMessage from '../../components/Shared/ErrorMessage';
 
 describe('ErrorMessage Component', () => {
     test('does not render when message is not provided', () => {

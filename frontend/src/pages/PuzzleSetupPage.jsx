@@ -11,7 +11,6 @@ export default function PuzzleSetupPage() {
     const [title, setTitle] = useState('');
 
     const handleSubmit = () => {
-        // Ideally store in global state (Zustand, Context, etc.)
         const config = {
             rows,
             cols,
@@ -19,7 +18,6 @@ export default function PuzzleSetupPage() {
             minLength,
             title: title.trim(),
         };
-        // For now, we'll just navigate with the config stored in memory or params
         navigate('/editor', { state: config });
     };
 
@@ -31,8 +29,9 @@ export default function PuzzleSetupPage() {
                 <div className="space-y-4">
                     <div className="flex gap-4">
                         <div className="flex-1">
-                            <label className="block text-sm font-medium text-gray-600">Rows</label>
+                            <label htmlFor="rows" className="block text-sm font-medium text-gray-600">Rows</label>
                             <input
+                                id="rows"
                                 type="number"
                                 min={5}
                                 max={25}
@@ -42,8 +41,9 @@ export default function PuzzleSetupPage() {
                             />
                         </div>
                         <div className="flex-1">
-                            <label className="block text-sm font-medium text-gray-600">Columns</label>
+                            <label htmlFor="cols" className="block text-sm font-medium text-gray-600">Columns</label>
                             <input
+                                id="cols"
                                 type="number"
                                 min={5}
                                 max={25}
@@ -55,8 +55,9 @@ export default function PuzzleSetupPage() {
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-600">Minimum Word Length</label>
+                        <label htmlFor="minLength" className="block text-sm font-medium text-gray-600">Minimum Word Length</label>
                         <input
+                            id="minLength"
                             type="number"
                             min={2}
                             max={10}
@@ -68,17 +69,19 @@ export default function PuzzleSetupPage() {
 
                     <div className="flex items-center space-x-2">
                         <input
+                            id="symmetry"
                             type="checkbox"
                             checked={symmetry}
                             onChange={() => setSymmetry(!symmetry)}
                             className="h-5 w-5"
                         />
-                        <label className="text-gray-700">Enable symmetry</label>
+                        <label htmlFor="symmetry" className="text-gray-700">Enable symmetry</label>
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-600">Puzzle Title (optional)</label>
+                        <label htmlFor="title" className="block text-sm font-medium text-gray-600">Puzzle Title (optional)</label>
                         <input
+                            id="title"
                             type="text"
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
@@ -90,6 +93,7 @@ export default function PuzzleSetupPage() {
                     <button
                         onClick={handleSubmit}
                         className="w-full bg-blue-600 text-white py-3 rounded-xl hover:bg-blue-700 transition"
+                        aria-label="Continue to Editor"
                     >
                         Continue to Editor
                     </button>

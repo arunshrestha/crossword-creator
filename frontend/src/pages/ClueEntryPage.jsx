@@ -2,63 +2,70 @@ import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import usePuzzleStore from '../store/puzzleStore';
 
+// Move numberGrid outside the component to avoid hook dependency warnings
+const numberGrid = (grid, rows, cols) => {
+    const clues = { across: [], down: [] };
+    let clueNumber = 1;
+    const cellHasNumber = Array(rows)
+        .fill(null)
+        .map(() => Array(cols).fill(null));
+
+    for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+            if (grid[r][c]?.isBlock) continue;
+
+            const startsAcross =
+                (c === 0 || grid[r][c - 1]?.isBlock) &&
+                c + 1 < cols &&
+                !grid[r][c + 1]?.isBlock;
+
+            const startsDown =
+                (r === 0 || grid[r - 1][c]?.isBlock) &&
+                r + 1 < rows &&
+                !grid[r + 1][c]?.isBlock;
+
+            if (startsAcross || startsDown) {
+                cellHasNumber[r][c] = clueNumber;
+
+                if (startsAcross) clues.across.push({ number: clueNumber, text: '' });
+                if (startsDown) clues.down.push({ number: clueNumber, text: '' });
+
+                clueNumber++;
+            }
+        }
+    }
+
+    return clues;
+};
+
 export default function ClueEntryPage() {
     const navigate = useNavigate();
-    const { title, rows, cols, gridData, clues, setClues } = usePuzzleStore();
+    const { title, rows, cols, gridData, setClues } = usePuzzleStore();
 
     const [acrossClues, setAcrossClues] = useState([]);
     const [downClues, setDownClues] = useState([]);
 
     useEffect(() => {
-        if (!gridData || !rows || !cols) return navigate('/setup');
+        if (!gridData || !rows || !cols) {
+            navigate('/setup');
+            return;
+        }
 
-        const numbered = numberGrid(gridData);
+        const numbered = numberGrid(gridData, rows, cols);
         setAcrossClues(numbered.across);
         setDownClues(numbered.down);
     }, [gridData, rows, cols, navigate]);
 
-    const numberGrid = (grid) => {
-        const clues = { across: [], down: [] };
-        let clueNumber = 1;
-        const cellHasNumber = Array(rows).fill(null).map(() => Array(cols).fill(null));
-
-        for (let r = 0; r < rows; r++) {
-            for (let c = 0; c < cols; c++) {
-                if (grid[r][c]?.isBlock) continue;
-
-                const startsAcross =
-                    (c === 0 || grid[r][c - 1]?.isBlock) &&
-                    c + 1 < cols && !grid[r][c + 1]?.isBlock;
-
-                const startsDown =
-                    (r === 0 || grid[r - 1][c]?.isBlock) &&
-                    r + 1 < rows && !grid[r + 1][c]?.isBlock;
-
-                if (startsAcross || startsDown) {
-                    cellHasNumber[r][c] = clueNumber;
-
-                    if (startsAcross) clues.across.push({ number: clueNumber, text: '' });
-                    if (startsDown) clues.down.push({ number: clueNumber, text: '' });
-
-                    clueNumber++;
-                }
-            }
-        }
-
-        return clues;
-    };
-
     const handleClueChange = (setter, index, newText) => {
         setter((prev) => {
             const updated = [...prev];
-            updated[index].text = newText;
+            updated[index] = { ...updated[index], text: newText };
             return updated;
         });
     };
 
     const handlePreview = () => {
         setClues({ across: acrossClues, down: downClues });
-
         navigate('/preview');
     };
 
@@ -110,7 +117,7 @@ export default function ClueEntryPage() {
 
             <div className="mt-6 text-center">
                 <button
-                    className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                    className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
                     onClick={handlePreview}
                 >
                     Preview Puzzle

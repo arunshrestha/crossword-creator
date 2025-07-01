@@ -1,7 +1,11 @@
+// index.js
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+
+// Import routes
+const puzzleRoutes = require('./routes/puzzleRoutes'); // <-- add this file
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -27,20 +31,21 @@ async function connectToDB() {
         console.log('✅ MongoDB connected and ping successful');
     } catch (error) {
         console.error('❌ MongoDB connection error:', error);
-        process.exit(1); // Exit if DB fails to connect
+        process.exit(1);
     }
 }
 
-// Routes
+// Base test route
 app.get('/', (req, res) => {
     res.send('🚀 Crossword backend is running');
 });
 
-// TODO: Add your crossword puzzle routes here
+// Register routes
+app.use('/api/puzzles', puzzleRoutes); // <-- all crossword routes here
 
-// Start the server after DB connects
+// Start server
 connectToDB().then(() => {
     app.listen(port, () => {
-        console.log(`✅ Server is running on http://localhost:${port}`);
+        console.log(`✅ Server running at http://localhost:${port}`);
     });
 });

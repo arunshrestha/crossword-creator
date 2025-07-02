@@ -27,7 +27,7 @@ const GridCell = ({
             aria-label={`Cell ${row + 1}, ${col + 1}`}
         >
             {!isBlock && number && (
-                <div className="absolute top-0 left-0 text-[10px] ml-1 mt-0.5 text-gray-600 z-10">
+                <div className="absolute top-0 left-0 text-[10px] text-gray-600 z-10 leading-none p-0.5">
                     {number}
                 </div>
             )}

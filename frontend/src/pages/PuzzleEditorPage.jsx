@@ -81,6 +81,10 @@ export default function PuzzleEditorPage() {
 
     const isGridReady = gridData && gridData.length === rows && rows > 0 && cols > 0;
 
+    const allCellsFilledOrBlocked = gridData.every(row =>
+        row.every(cell => cell.isBlock || cell.value)
+    );
+
     return (
         <div className="min-h-screen bg-white px-4 py-8 flex flex-col items-center">
             <h2 className="text-3xl font-semibold mb-6">Fill in Your Answers</h2>
@@ -112,7 +116,7 @@ export default function PuzzleEditorPage() {
                 onClick={() => navigate('/clues')}
                 className="bg-indigo-600 hover:bg-indigo-700 text-white py-3 px-6 rounded-lg text-lg shadow-md disabled:opacity-50"
                 aria-label="Proceed to Clue Entry"
-                disabled={!isGridReady}
+                disabled={!isGridReady || !allCellsFilledOrBlocked}
             >
                 Proceed to Clue Entry
             </button>

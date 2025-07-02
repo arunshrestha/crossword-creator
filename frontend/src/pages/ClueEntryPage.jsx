@@ -1,8 +1,9 @@
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import usePuzzleStore from '../store/puzzleStore';
+import CrosswordGrid from '../components/Grid/CrosswordGrid';
 
-// Move numberGrid outside the component to avoid hook dependency warnings
+// Updated numberGrid to return both clues and cell numbers
 const numberGrid = (grid, rows, cols) => {
     const clues = { across: [], down: [] };
     let clueNumber = 1;
@@ -35,7 +36,7 @@ const numberGrid = (grid, rows, cols) => {
         }
     }
 
-    return clues;
+    return { clues, cellHasNumber };
 };
 
 export default function ClueEntryPage() {
@@ -44,6 +45,7 @@ export default function ClueEntryPage() {
 
     const [acrossClues, setAcrossClues] = useState([]);
     const [downClues, setDownClues] = useState([]);
+    const [cellNumbers, setCellNumbers] = useState([]);
 
     useEffect(() => {
         if (!gridData || !rows || !cols) {
@@ -52,8 +54,9 @@ export default function ClueEntryPage() {
         }
 
         const numbered = numberGrid(gridData, rows, cols);
-        setAcrossClues(numbered.across);
-        setDownClues(numbered.down);
+        setAcrossClues(numbered.clues.across);
+        setDownClues(numbered.clues.down);
+        setCellNumbers(numbered.cellHasNumber);
     }, [gridData, rows, cols, navigate]);
 
     const handleClueChange = (setter, index, newText) => {
@@ -69,9 +72,30 @@ export default function ClueEntryPage() {
         navigate('/preview');
     };
 
+    // Prepare blocks and grid for CrosswordGrid
+    const blocks = new Set();
+    gridData?.forEach((row, rIdx) =>
+        row.forEach((cell, cIdx) => {
+            if (cell.isBlock) blocks.add(`${rIdx}-${cIdx}`);
+        })
+    );
+    const grid = gridData?.map(row => row.map(cell => cell.value || '')) || [];
+
+    // Prepare numbers prop for CrosswordGrid
+    const numbers = {};
+    cellNumbers.forEach((row, rIdx) =>
+        row.forEach((num, cIdx) => {
+            if (num) numbers[`${rIdx}-${cIdx}`] = num;
+        })
+    );
+
     return (
         <div className="min-h-screen p-6 bg-gray-100">
             <h2 className="text-2xl font-bold mb-4 text-center">{title || 'Clue Entry'}</h2>
+
+            <div className="flex justify-center mb-8">
+                <CrosswordGrid grid={grid} blocks={blocks} numbers={numbers} />
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>

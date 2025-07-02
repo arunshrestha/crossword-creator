@@ -17,7 +17,7 @@ const CrosswordGrid = ({ grid, numbers = {}, blocks = new Set(), onCellClick }) 
 
     return (
         <div
-            className="grid gap-px bg-gray-400 select-none overflow-auto"
+            className="grid select-none overflow-auto border border-black"
             style={{
                 gridTemplateColumns: `repeat(${grid[0]?.length || 0}, minmax(2rem, 1fr))`
             }}

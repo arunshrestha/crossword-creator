@@ -18,8 +18,8 @@ const GridCell = ({
     return (
         <div
             data-testid={`cell-${row}-${col}`}
-            className={`w-10 h-10 flex items-center justify-center border text-lg font-mono select-none relative ${baseClasses}`}
-            onClick={() => !isBlock && onClick && onClick(row, col)}
+            className={`w-10 h-10 flex items-center justify-center border border-gray-400 text-lg font-mono select-none relative ${baseClasses}`}
+            onClick={() => onClick && onClick(row, col)}
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
             role="button"

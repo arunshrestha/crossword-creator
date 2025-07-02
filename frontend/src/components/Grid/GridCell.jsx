@@ -1,5 +1,4 @@
 import React from 'react';
-import GridCellHighlight from './GridCellHighlight';
 
 const GridCell = ({
     row,
@@ -14,12 +13,12 @@ const GridCell = ({
 }) => {
     const baseClasses = isBlock
         ? 'bg-black'
-        : 'bg-white hover:bg-blue-100 cursor-pointer relative';
+        : 'bg-white hover:bg-blue-100 cursor-pointer';
 
     return (
         <div
             data-testid={`cell-${row}-${col}`}
-            className={`w-10 h-10 flex items-center justify-center border text-lg font-mono select-none ${baseClasses}`}
+            className={`w-10 h-10 flex items-center justify-center border text-lg font-mono select-none relative ${baseClasses}`}
             onClick={() => !isBlock && onClick && onClick(row, col)}
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
@@ -28,13 +27,17 @@ const GridCell = ({
             aria-label={`Cell ${row + 1}, ${col + 1}`}
         >
             {!isBlock && number && (
-                <div className="absolute top-0 left-0 text-[10px] ml-1 mt-0.5 text-gray-600">
+                <div className="absolute top-0 left-0 text-[10px] ml-1 mt-0.5 text-gray-600 z-10">
                     {number}
                 </div>
             )}
             {!isBlock && value}
-
-            {!isBlock && <GridCellHighlight isActive={isActive} />}
+            {!isBlock && (
+                <div
+                    className={`absolute inset-0 transition-colors ${isActive ? 'bg-yellow-200' : ''} z-0`}
+                    data-testid="grid-cell-highlight"
+                />
+            )}
         </div>
     );
 };

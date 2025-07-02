@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 body {
   font-family: Arial, sans-serif;
   margin: 0;
@@ -7,26 +11,4 @@ body {
 .App {
   text-align: center;
   padding: 20px;
-}
-
-.grid {
-  display: inline-block;
-  margin: 20px auto;
-}
-
-.grid-row {
-  display: flex;
-}
-
-.grid-cell {
-  width: 30px;
-  height: 30px;
-  border: 1px solid #ccc;
-  display: inline-block;
-  background-color: white;
-  cursor: pointer;
-}
-
-.grid-cell.dark {
-  background-color: black;
 }

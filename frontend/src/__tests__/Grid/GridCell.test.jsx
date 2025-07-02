@@ -60,3 +60,49 @@ describe('GridCell', () => {
         expect(highlight).not.toHaveClass('bg-yellow-200');
     });
 });
+
+describe('GridCell highlight', () => {
+    it('renders highlight with yellow background when isActive is true', () => {
+        render(
+            <GridCell
+                row={0}
+                col={0}
+                value="A"
+                isBlock={false}
+                isActive={true}
+            />
+        );
+        const highlight = screen.getByTestId('grid-cell-highlight');
+        expect(highlight).toBeInTheDocument();
+        expect(highlight).toHaveClass('bg-yellow-200');
+    });
+
+    it('renders highlight without yellow background when isActive is false', () => {
+        render(
+            <GridCell
+                row={0}
+                col={0}
+                value="A"
+                isBlock={false}
+                isActive={false}
+            />
+        );
+        const highlight = screen.getByTestId('grid-cell-highlight');
+        expect(highlight).toBeInTheDocument();
+        expect(highlight).not.toHaveClass('bg-yellow-200');
+    });
+
+    it('does not render highlight for block cells', () => {
+        render(
+            <GridCell
+                row={0}
+                col={0}
+                value=""
+                isBlock={true}
+                isActive={true}
+            />
+        );
+        const highlight = screen.queryByTestId('grid-cell-highlight');
+        expect(highlight).not.toBeInTheDocument();
+    });
+});

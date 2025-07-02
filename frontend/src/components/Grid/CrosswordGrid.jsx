@@ -12,10 +12,15 @@ const CrosswordGrid = ({ grid, numbers = {}, blocks = new Set(), onCellClick }) 
         setActiveCell({ row: null, col: null });
     };
 
+    console.log('grid:', grid);
+    console.log('grid shape:', Array.isArray(grid), Array.isArray(grid[0]));
+
     return (
         <div
-            className="grid gap-px bg-gray-400 select-none"
-            style={{ gridTemplateColumns: `repeat(${grid[0]?.length || 0}, 1fr)` }}
+            className="grid gap-px bg-gray-400 select-none overflow-auto"
+            style={{
+                gridTemplateColumns: `repeat(${grid[0]?.length || 0}, minmax(2rem, 1fr))`
+            }}
             data-testid="crossword-grid"
         >
             {grid.map((row, rowIndex) =>
@@ -35,7 +40,9 @@ const CrosswordGrid = ({ grid, numbers = {}, blocks = new Set(), onCellClick }) 
                             onClick={onCellClick}
                             onMouseEnter={() => handleMouseEnter(rowIndex, colIndex)}
                             onMouseLeave={handleMouseLeave}
-                            isActive={activeCell.row === rowIndex && activeCell.col === colIndex}
+                            isActive={
+                                activeCell.row === rowIndex && activeCell.col === colIndex
+                            }
                         />
                     );
                 })

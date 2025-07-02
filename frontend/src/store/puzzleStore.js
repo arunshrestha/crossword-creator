@@ -19,6 +19,12 @@ const usePuzzleStore = create((set) => ({
     setCols: (cols) => set({ cols }),
     setGridData: (gridData) => set({ gridData }),
 
+    setClues: ({ across, down }) =>
+        set({
+            acrossClues: across,
+            downClues: down,
+        }),
+
     initializePuzzle: ({ title, rows, cols }) =>
         set({
             title,

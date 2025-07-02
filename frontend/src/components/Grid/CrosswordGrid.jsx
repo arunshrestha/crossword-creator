@@ -12,9 +12,6 @@ const CrosswordGrid = ({ grid, numbers = {}, blocks = new Set(), onCellClick }) 
         setActiveCell({ row: null, col: null });
     };
 
-    console.log('grid:', grid);
-    console.log('grid shape:', Array.isArray(grid), Array.isArray(grid[0]));
-
     return (
         <div
             className="grid select-none overflow-auto border border-black"

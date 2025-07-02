@@ -54,6 +54,10 @@ export default function ClueEntryPage() {
         })
     );
 
+    const allCluesFilled =
+        acrossClues.every(clue => clue.text && clue.text.trim() !== '') &&
+        downClues.every(clue => clue.text && clue.text.trim() !== '');
+
     return (
         <div className="min-h-screen p-6 bg-gray-100">
             <h2 className="text-2xl font-bold mb-4 text-center">{title || 'Clue Entry'}</h2>
@@ -106,8 +110,9 @@ export default function ClueEntryPage() {
 
             <div className="mt-6 text-center">
                 <button
-                    className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+                    className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition disabled:opacity-50"
                     onClick={handlePreview}
+                    disabled={!allCluesFilled}
                 >
                     Preview Puzzle
                 </button>

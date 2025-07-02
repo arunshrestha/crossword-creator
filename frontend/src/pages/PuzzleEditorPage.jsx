@@ -33,28 +33,27 @@ export default function PuzzleEditorPage() {
         const cell = gridData[row][col];
         const updatedGrid = [...gridData.map(r => [...r])];
 
-        const applySymmetry = (r, c, updateFn) => {
-            updateFn(r, c);
-            if (symmetryEnabled) {
-                const symR = rows - 1 - r;
-                const symC = cols - 1 - c;
-                if (symR !== r || symC !== c) {
-                    updateFn(symR, symC);
-                }
-            }
-        };
-
         if (blockMode) {
+            // Apply symmetry when toggling blocks
+            const applySymmetry = (r, c, updateFn) => {
+                updateFn(r, c);
+                if (symmetryEnabled) {
+                    const symR = rows - 1 - r;
+                    const symC = cols - 1 - c;
+                    if (symR !== r || symC !== c) {
+                        updateFn(symR, symC);
+                    }
+                }
+            };
             applySymmetry(row, col, (r, c) => {
                 updatedGrid[r][c] = { ...updatedGrid[r][c], isBlock: !updatedGrid[r][c].isBlock, value: '' };
             });
             setGridData(updatedGrid);
         } else {
+            // Do NOT apply symmetry when entering a value
             const letter = window.prompt('Enter a letter:', cell.value || '');
             if (letter && /^[A-Za-z]$/.test(letter)) {
-                applySymmetry(row, col, (r, c) => {
-                    updatedGrid[r][c] = { ...updatedGrid[r][c], value: letter.toUpperCase(), isBlock: false };
-                });
+                updatedGrid[row][col] = { ...updatedGrid[row][col], value: letter.toUpperCase(), isBlock: false };
                 setGridData(updatedGrid);
             }
         }

@@ -2,42 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import usePuzzleStore from '../store/puzzleStore';
 import CrosswordGrid from '../components/Grid/CrosswordGrid';
-
-// Updated numberGrid to return both clues and cell numbers
-const numberGrid = (grid, rows, cols) => {
-    const clues = { across: [], down: [] };
-    let clueNumber = 1;
-    const cellHasNumber = Array(rows)
-        .fill(null)
-        .map(() => Array(cols).fill(null));
-
-    for (let r = 0; r < rows; r++) {
-        for (let c = 0; c < cols; c++) {
-            if (grid[r][c]?.isBlock) continue;
-
-            const startsAcross =
-                (c === 0 || grid[r][c - 1]?.isBlock) &&
-                c + 1 < cols &&
-                !grid[r][c + 1]?.isBlock;
-
-            const startsDown =
-                (r === 0 || grid[r - 1][c]?.isBlock) &&
-                r + 1 < rows &&
-                !grid[r + 1][c]?.isBlock;
-
-            if (startsAcross || startsDown) {
-                cellHasNumber[r][c] = clueNumber;
-
-                if (startsAcross) clues.across.push({ number: clueNumber, text: '' });
-                if (startsDown) clues.down.push({ number: clueNumber, text: '' });
-
-                clueNumber++;
-            }
-        }
-    }
-
-    return { clues, cellHasNumber };
-};
+import { autoNumberGrid } from '../utils/autoNumberGrid';
 
 export default function ClueEntryPage() {
     const navigate = useNavigate();
@@ -53,7 +18,7 @@ export default function ClueEntryPage() {
             return;
         }
 
-        const numbered = numberGrid(gridData, rows, cols);
+        const numbered = autoNumberGrid(gridData);
         setAcrossClues(numbered.clues.across);
         setDownClues(numbered.clues.down);
         setCellNumbers(numbered.cellHasNumber);

@@ -1,27 +1,35 @@
 import { useNavigate } from 'react-router-dom';
 import usePuzzleStore from '../store/puzzleStore';
+import { autoNumberGrid } from '../utils/autoNumberGrid';
 
 export default function PreviewPage() {
     const navigate = useNavigate();
-    const { title, rows, cols, gridData, clues } = usePuzzleStore();
+    const { title, rows, cols, gridData, acrossClues, downClues } = usePuzzleStore();
 
-    if (!gridData || !clues) return <p className="p-6 text-center">No puzzle data found.</p>;
+    if (!gridData || !acrossClues || !downClues) {
+        return <p className="p-6 text-center">No puzzle data found.</p>;
+    }
+
+    // Generate cell numbers for the preview grid
+    const { cellHasNumber } = autoNumberGrid(gridData);
 
     const renderCell = (r, c) => {
         const cell = gridData[r][c];
         const isBlock = cell?.isBlock;
+        const number = cellHasNumber[r][c];
+        const value = cell?.value || '';
 
         return (
             <div
                 key={`${r}-${c}`}
-                className={`w-10 h-10 border border-gray-400 relative text-xs flex items-center justify-center ${isBlock ? 'bg-black' : 'bg-white'
-                    }`}
+                className={`w-10 h-10 border border-gray-400 relative text-lg font-mono flex items-center justify-center ${isBlock ? 'bg-black' : 'bg-white'}`}
             >
-                {!isBlock && cell?.number && (
-                    <div className="absolute top-0 left-0 text-[0.5rem] m-1 text-gray-700">
-                        {cell.number}
+                {!isBlock && number && (
+                    <div className="absolute top-0 left-0 text-[10px] text-gray-600 z-10 leading-none p-0.5">
+                        {number}
                     </div>
                 )}
+                {!isBlock && value}
             </div>
         );
     };
@@ -53,9 +61,9 @@ export default function PreviewPage() {
 
                 {/* Clues */}
                 <div className="flex-1 max-w-md">
-                    {renderClueList('Across', clues.across)}
+                    {renderClueList('Across', acrossClues)}
                     <div className="mt-6" />
-                    {renderClueList('Down', clues.down)}
+                    {renderClueList('Down', downClues)}
                 </div>
             </div>
 

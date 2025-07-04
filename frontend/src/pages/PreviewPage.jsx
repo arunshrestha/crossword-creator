@@ -1,10 +1,14 @@
 import { useNavigate } from 'react-router-dom';
 import usePuzzleStore from '../store/puzzleStore';
 import { autoNumberGrid } from '../utils/autoNumberGrid';
+import { useState } from 'react';
+
+const API_BASE = process.env.REACT_APP_API_URL;
 
 export default function PreviewPage() {
     const navigate = useNavigate();
     const { title, rows, cols, gridData, acrossClues, downClues } = usePuzzleStore();
+    const [saving, setSaving] = useState(false);
 
     if (!gridData || !acrossClues || !downClues) {
         return <p className="p-6 text-center">No puzzle data found.</p>;
@@ -47,6 +51,39 @@ export default function PreviewPage() {
         </div>
     );
 
+    // Example: Fetch all puzzles (for testing)
+    // fetch(`${API_BASE}/api/puzzles`)
+    //   .then(res => res.json())
+    //   .then(data => console.log(data));
+
+    const handleSave = async () => {
+        setSaving(true);
+        try {
+            const response = await fetch(`${API_BASE}/api/puzzles`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    title,
+                    rows,
+                    cols,
+                    gridData,
+                    acrossClues,
+                    downClues,
+                }),
+            });
+            const data = await response.json();
+            if (response.ok && data._id) {
+                navigate('/success', { state: { puzzleId: data._id } });
+            } else {
+                alert('Failed to save puzzle.');
+            }
+        } catch (err) {
+            alert('Error saving puzzle.');
+        } finally {
+            setSaving(false);
+        }
+    };
+
     return (
         <div className="min-h-screen p-6 bg-gray-50">
             <h1 className="text-3xl font-bold mb-6 text-center">{title || 'Puzzle Preview'}</h1>
@@ -76,9 +113,10 @@ export default function PreviewPage() {
                 </button>
                 <button
                     className="px-5 py-2 rounded bg-green-600 text-white hover:bg-green-700 transition"
-                    onClick={() => alert('Saving logic goes here')}
+                    onClick={handleSave}
+                    disabled={saving}
                 >
-                    Save Puzzle
+                    {saving ? 'Saving...' : 'Save Puzzle'}
                 </button>
             </div>
         </div>

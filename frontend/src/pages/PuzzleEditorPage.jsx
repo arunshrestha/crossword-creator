@@ -50,7 +50,8 @@ export default function PuzzleEditorPage() {
             });
             setGridData(updatedGrid);
         } else {
-            // Do NOT apply symmetry when entering a value
+            // Only allow entering a value if the cell is not a block
+            if (cell.isBlock) return;
             const letter = window.prompt('Enter a letter:', cell.value || '');
             if (letter && /^[A-Za-z]$/.test(letter)) {
                 updatedGrid[row][col] = { ...updatedGrid[row][col], value: letter.toUpperCase(), isBlock: false };

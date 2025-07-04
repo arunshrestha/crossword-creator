@@ -32,49 +32,58 @@ export default function CompletionPage() {
     const renderGrid = () => {
         if (!userGrid.length || !solutionGrid.length) return null;
         return (
-            <div
-                className="grid mx-auto my-6"
-                style={{
-                    gridTemplateColumns: `repeat(${solutionGrid[0].length}, 2.5rem)`,
-                    width: 'fit-content',
-                }}
-            >
-                {userGrid.map((row, r) =>
-                    row.map((cell, c) => {
-                        if (cell.isBlock) {
-                            return (
-                                <div
-                                    key={`${r}-${c}`}
-                                    className="w-10 h-10 bg-black border border-gray-400"
-                                />
-                            );
-                        }
-                        const isCorrect =
-                            cell.input &&
-                            solutionGrid[r][c].value &&
-                            cell.input.toUpperCase() === solutionGrid[r][c].value.toUpperCase();
-                        return (
-                            <div
-                                key={`${r}-${c}`}
-                                className={`w-10 h-10 border border-gray-400 flex items-center justify-center text-lg font-mono relative
-                                    ${isCorrect ? 'bg-green-100' : 'bg-red-100'}
-                                `}
-                                title={
-                                    isCorrect
-                                        ? 'Correct'
-                                        : `Incorrect, correct answer: ${solutionGrid[r][c].value || ''}`
+            <div className="flex justify-center w-full">
+                <div
+                    // Remove overflow-auto and max sizes to prevent scrolling
+                    style={{
+                        margin: '0 auto',
+                    }}
+                >
+                    <div
+                        className="grid"
+                        style={{
+                            gridTemplateColumns: `repeat(${solutionGrid[0].length}, 2.5rem)`,
+                            width: 'fit-content',
+                        }}
+                    >
+                        {userGrid.map((row, r) =>
+                            row.map((cell, c) => {
+                                if (cell.isBlock) {
+                                    return (
+                                        <div
+                                            key={`${r}-${c}`}
+                                            className="w-10 h-10 bg-black border border-gray-400"
+                                        />
+                                    );
                                 }
-                            >
-                                <span className="font-bold">{cell.input || ''}</span>
-                                {!isCorrect && solutionGrid[r][c].value && (
-                                    <span className="absolute bottom-0 right-0 text-xs text-gray-500 px-1">
-                                        {solutionGrid[r][c].value}
-                                    </span>
-                                )}
-                            </div>
-                        );
-                    })
-                )}
+                                const isCorrect =
+                                    cell.input &&
+                                    solutionGrid[r][c].value &&
+                                    cell.input.toUpperCase() === solutionGrid[r][c].value.toUpperCase();
+                                return (
+                                    <div
+                                        key={`${r}-${c}`}
+                                        className={`w-10 h-10 border border-gray-400 flex items-center justify-center text-lg font-mono relative
+                                        ${isCorrect ? 'bg-green-100' : 'bg-red-100'}
+                                    `}
+                                        title={
+                                            isCorrect
+                                                ? 'Correct'
+                                                : `Incorrect, correct answer: ${solutionGrid[r][c].value || ''}`
+                                        }
+                                    >
+                                        <span className="font-bold">{cell.input || ''}</span>
+                                        {!isCorrect && solutionGrid[r][c].value && (
+                                            <span className="absolute bottom-0 right-0 text-xs text-gray-500 px-1">
+                                                {solutionGrid[r][c].value}
+                                            </span>
+                                        )}
+                                    </div>
+                                );
+                            })
+                        )}
+                    </div>
+                </div>
             </div>
         );
     };
@@ -82,7 +91,7 @@ export default function CompletionPage() {
     return (
         <div className="min-h-screen bg-green-50 flex flex-col items-center justify-center p-6">
             <div
-                className="bg-white shadow-lg rounded-xl p-8 max-w-md text-center"
+                className="bg-white shadow-lg rounded-xl p-8 w-full max-w-4xl text-center"
                 role="region"
                 aria-labelledby="completion-heading"
             >

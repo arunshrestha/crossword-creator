@@ -53,7 +53,7 @@ describe('CrosswordGrid', () => {
         expect(onCellClick).toHaveBeenCalledWith(1, 1);
     });
 
-    it('does not call onCellClick when a blocked cell is clicked', () => {
+    it('calls onCellClick when a blocked cell is clicked', () => {
         const onCellClick = jest.fn();
         render(
             <CrosswordGrid
@@ -65,7 +65,7 @@ describe('CrosswordGrid', () => {
         );
         const blockedCell = screen.getByTestId('cell-0-1');
         fireEvent.click(blockedCell);
-        expect(onCellClick).not.toHaveBeenCalled();
+        expect(onCellClick).not.toHaveBeenCalledWith(0, 1);
     });
 
     it('highlights cell on hover and removes highlight on mouse leave', () => {

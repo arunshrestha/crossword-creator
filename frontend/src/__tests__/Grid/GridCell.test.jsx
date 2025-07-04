@@ -32,19 +32,19 @@ describe('GridCell', () => {
         expect(onClick).toHaveBeenCalledWith(2, 2);
     });
 
-    it('does not call onClick when clicked on block cell', () => {
+    it('calls onClick when clicked on block cell', () => {
         const onClick = jest.fn();
         render(
             <GridCell row={3} col={3} value="" isBlock={true} onClick={onClick} />
         );
         const cell = screen.getByTestId('cell-3-3');
         fireEvent.click(cell);
-        expect(onClick).not.toHaveBeenCalled();
+        expect(onClick).toHaveBeenCalledWith(3, 3);
     });
 
     it('renders highlight when isActive is true', () => {
         render(
-            <GridCell row={4} col={4} value="C" isBlock={false} isActive={true} />
+            <GridCell row={5} col={5} value="C" isBlock={false} isActive={true} />
         );
         const highlight = screen.getByTestId('grid-cell-highlight');
         expect(highlight).toBeInTheDocument();
@@ -52,7 +52,7 @@ describe('GridCell', () => {
 
     it('does not render highlight when isActive is false', () => {
         render(
-            <GridCell row={5} col={5} value="D" isBlock={false} isActive={false} />
+            <GridCell row={6} col={6} value="D" isBlock={false} isActive={false} />
         );
         const highlight = screen.queryByTestId('grid-cell-highlight');
         // It renders always but without highlight class

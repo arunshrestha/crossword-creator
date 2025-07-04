@@ -1,42 +1,45 @@
 import { autoNumberGrid } from '../../components/Grid/AutoNumberingHelper';
 
 describe('autoNumberGrid', () => {
-    it('correctly assigns clue numbers based on block positions', () => {
-        // Grid 3x3 with blocks at (0,2) and (1,1)
+    it('correctly assigns clue numbers based on block positions in a 5x5 grid', () => {
+        // 5x5 grid with some blocks
         const grid = [
-            ['A', 'B', ''],    // empty string means block or black square
-            ['C', '', 'D'],
-            ['E', 'F', 'G'],
+            ['A', 'B', '', 'C', 'D'],
+            ['E', '', 'F', '', 'G'],
+            ['H', 'I', 'J', '', 'K'],
+            ['', 'L', '', 'M', 'N'],
+            ['O', 'P', 'Q', 'R', ''],
         ];
 
         // Blocks are cells with empty string value
-        const blocks = new Set(['0-2', '1-1']);
+        const blocks = new Set([
+            '0-2', '1-1', '1-3', '2-3', '3-0', '3-2', '4-4'
+        ]);
 
         const numbers = autoNumberGrid(grid, blocks);
 
-        // Expected numbering logic:
-        // (0,0): starts across (col 0) and down (row 0) -> 1
-        // (0,1): preceded by non-block horizontally (0,0) and vertically (no block above), so no new number
-        // (1,0): starts down (row 1, col 0), because cell above is not blocked? Actually (0,0) is not blocked so no new number for down? 
-        //   Wait, per code, startsDown = (r === 0 || isBlock(r-1,c)) → here r=1, c=0, isBlock(0,0) false, so startsDown false
-        //   startsAcross = (c===0 || isBlock(r,c-1)) → c=0 so true
-        // So (1,0) starts across → should get a number 2
-        // (1,2): starts across? c=2, preceded by (1,1) which is blocked → true, startsDown? r=1, preceded by (0,2) blocked → true
-        //   So (1,2) gets number 3
-        // (2,0): r=2,c=0, startsAcross true (c=0), startsDown? r=2, check (1,0) not blocked → false
-        //   So number 4
-        // (2,1): preceded by (2,0) not blocked horizontally and (1,1) blocked vertically, so startsDown false, startsAcross false
-        // (2,2): preceded by (2,1) no block horizontally, so false
+        console.log(numbers);
 
-        expect(numbers['0-0']).toBe(1);
-        expect(numbers['1-0']).toBe(2);
-        expect(numbers['1-2']).toBe(3);
-        expect(numbers['2-0']).toBe(4);
+        // Check a few expected numbered cells (these will depend on your numbering logic)
+        expect(numbers['0-0']).toBe(1); // starts across and down
+        expect(numbers['0-3']).toBe(2); // starts across and down
+        expect(numbers['1-2']).toBe(3); // starts across and down
+        expect(numbers['1-4']).toBe(4); // starts across and down
+        expect(numbers['2-0']).toBe(5); // starts across and down
+        expect(numbers['2-1']).toBe(6); // starts across
+        expect(numbers['2-4']).toBe(7); // starts across and down
+        expect(numbers['3-1']).toBe(8); // starts across and down
+        expect(numbers['3-3']).toBe(9); // starts across and down
+        expect(numbers['4-0']).toBe(10); // starts across and down
 
-        // Check that other cells are not numbered
-        expect(numbers['0-1']).toBeUndefined();
-        expect(numbers['2-1']).toBeUndefined();
-        expect(numbers['2-2']).toBeUndefined();
+        // Check that a blocked cell is not numbered
+        expect(numbers['0-2']).toBeUndefined();
+        expect(numbers['1-1']).toBeUndefined();
+        expect(numbers['1-3']).toBeUndefined();
+        expect(numbers['2-3']).toBeUndefined();
+        expect(numbers['3-0']).toBeUndefined();
+        expect(numbers['3-2']).toBeUndefined();
+        expect(numbers['4-4']).toBeUndefined();
     });
 
     it('returns empty map when grid is empty', () => {
@@ -46,10 +49,19 @@ describe('autoNumberGrid', () => {
 
     it('returns empty map when all cells are blocked', () => {
         const grid = [
-            ['', ''],
-            ['', ''],
+            ['', '', '', '', ''],
+            ['', '', '', '', ''],
+            ['', '', '', '', ''],
+            ['', '', '', '', ''],
+            ['', '', '', '', ''],
         ];
-        const blocks = new Set(['0-0', '0-1', '1-0', '1-1']);
+        const blocks = new Set([
+            '0-0', '0-1', '0-2', '0-3', '0-4',
+            '1-0', '1-1', '1-2', '1-3', '1-4',
+            '2-0', '2-1', '2-2', '2-3', '2-4',
+            '3-0', '3-1', '3-2', '3-3', '3-4',
+            '4-0', '4-1', '4-2', '4-3', '4-4'
+        ]);
         const numbers = autoNumberGrid(grid, blocks);
         expect(numbers).toEqual({});
     });

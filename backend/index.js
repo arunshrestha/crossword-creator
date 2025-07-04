@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const connectToDB = require('./config/db');
 
 // Import routes
 const puzzleRoutes = require('./routes/puzzleRoutes');
@@ -36,17 +37,6 @@ const clientOptions = {
         deprecationErrors: true,
     },
 };
-
-async function connectToDB() {
-    try {
-        await mongoose.connect(uri, clientOptions);
-        await mongoose.connection.db.admin().command({ ping: 1 });
-        console.log('✅ MongoDB connected and ping successful');
-    } catch (error) {
-        console.error('❌ MongoDB connection error:', error);
-        process.exit(1);
-    }
-}
 
 // Base test route
 app.get('/', (req, res) => {

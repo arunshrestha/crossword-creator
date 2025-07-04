@@ -1,34 +1,69 @@
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
+import { autoNumberGrid } from '../utils/autoNumberGrid';
 
-export default function PuzzleViewerPage() {
-    const { state } = useLocation();
+export default function PuzzlePlayerPage() {
+    const { id } = useParams();
     const navigate = useNavigate();
-    const { grid, title, acrossClues, downClues } = state || {};
+    const location = useLocation();
 
+    // Try to get state if coming from inside the app
+    const { grid, title, acrossClues, downClues } = location.state || {};
+
+    const [puzzle, setPuzzle] = useState(
+        grid && title && acrossClues && downClues
+            ? { grid, title, acrossClues, downClues }
+            : null
+    );
+    const [loading, setLoading] = useState(!puzzle);
+    const [error, setError] = useState('');
     const [userGrid, setUserGrid] = useState([]);
     const [focusedCell, setFocusedCell] = useState({ row: null, col: null });
     const inputRefs = useRef([]);
+    const [cellNumbers, setCellNumbers] = useState([]);
 
+    // Fetch puzzle if not in state
     useEffect(() => {
-        if (!grid || !acrossClues || !downClues) {
-            navigate('/'); // redirect if data missing
-            return;
-        }
+        if (puzzle) return;
+        setLoading(true);
+        fetch(`${process.env.REACT_APP_API_URL}/api/puzzles/${id}`)
+            .then(res => {
+                if (!res.ok) throw new Error('Puzzle not found');
+                return res.json();
+            })
+            .then(data => {
+                setPuzzle({
+                    grid: data.gridData,
+                    title: data.title,
+                    acrossClues: data.acrossClues,
+                    downClues: data.downClues,
+                });
+                setLoading(false);
+            })
+            .catch(() => {
+                setError('Puzzle not found.');
+                setLoading(false);
+            });
+    }, [id, puzzle]);
 
-        const clone = grid.map(row =>
+    // Initialize userGrid and cellNumbers when puzzle is loaded
+    useEffect(() => {
+        if (!puzzle) return;
+        const clone = puzzle.grid.map(row =>
             row.map(cell => ({
                 ...cell,
                 input: cell.isBlock ? null : '',
             }))
         );
         setUserGrid(clone);
-
-        // Initialize refs array size
         inputRefs.current = clone.flat().map(() => null);
-    }, [grid, acrossClues, downClues, navigate]);
 
-    const cellIndex = (row, col) => row * grid[0].length + col;
+        // Numbering logic
+        const { cellHasNumber } = autoNumberGrid(puzzle.grid);
+        setCellNumbers(cellHasNumber);
+    }, [puzzle]);
+
+    const cellIndex = (row, col) => row * (puzzle?.grid[0].length || 0) + col;
 
     const handleChange = (row, col, value) => {
         setUserGrid(prev => {
@@ -38,10 +73,10 @@ export default function PuzzleViewerPage() {
         });
     };
 
-    // Handle arrow key navigation within the grid inputs
     const handleKeyDown = (e, row, col) => {
-        const maxRow = grid.length - 1;
-        const maxCol = grid[0].length - 1;
+        if (!puzzle) return;
+        const maxRow = puzzle.grid.length - 1;
+        const maxCol = puzzle.grid[0].length - 1;
 
         let newRow = row;
         let newCol = col;
@@ -85,7 +120,6 @@ export default function PuzzleViewerPage() {
         setFocusedCell({ row: newRow, col: newCol });
     };
 
-    // Get clue numbers for a focused cell
     const getCluesForCell = (row, col) => {
         if (!userGrid[row] || !userGrid[row][col]) return { across: null, down: null };
         const cell = userGrid[row][col];
@@ -101,21 +135,51 @@ export default function PuzzleViewerPage() {
     );
 
     const handleSubmit = () => {
-        alert('Submission logic not implemented yet.');
-        navigate('/completed');
+        // Calculate score
+        let correctCells = 0;
+        let totalCells = 0;
+        userGrid.forEach((row, r) => {
+            row.forEach((cell, c) => {
+                if (!cell.isBlock) {
+                    totalCells++;
+                    // Compare user input to the correct answer (assuming puzzle.grid[r][c].value is the answer)
+                    if (
+                        cell.input &&
+                        puzzle.grid[r][c].value &&
+                        cell.input.toUpperCase() === puzzle.grid[r][c].value.toUpperCase()
+                    ) {
+                        correctCells++;
+                    }
+                }
+            });
+        });
+        const score = totalCells > 0 ? Math.round((correctCells / totalCells) * 100) : 0;
+
+        navigate(`/complete/${id}`, {
+            state: {
+                title: puzzle.title,
+                userGrid,
+                solutionGrid: puzzle.grid,
+                score,
+                totalCells,
+                correctCells,
+            },
+        });
     };
 
-    if (!userGrid.length) return null;
+    if (loading) return <div className="p-8 text-center">Loading puzzle...</div>;
+    if (error) return <div className="p-8 text-center text-red-600">{error}</div>;
+    if (!userGrid.length || !puzzle) return null;
 
     return (
         <div className="min-h-screen bg-gray-50 p-6">
-            <h2 className="text-2xl font-bold mb-4 text-center">{title || 'Crossword Puzzle'}</h2>
+            <h2 className="text-2xl font-bold mb-6 text-center">{puzzle.title || 'Crossword Puzzle'}</h2>
 
-            <div className="flex flex-col lg:flex-row gap-8 max-w-6xl mx-auto">
+            <div className="flex flex-col lg:flex-row justify-center items-start gap-12 max-w-6xl mx-auto">
                 {/* Crossword Grid */}
                 <div
                     className="grid"
-                    style={{ gridTemplateColumns: `repeat(${grid[0].length}, 2.5rem)` }}
+                    style={{ gridTemplateColumns: `repeat(${puzzle.grid[0].length}, 2.5rem)` }}
                     role="grid"
                     aria-label="Crossword puzzle grid"
                 >
@@ -145,34 +209,33 @@ export default function PuzzleViewerPage() {
                                         }
                                     }}
                                 >
+                                    {/* Show clue number */}
+                                    {!cell.isBlock && cellNumbers[rowIndex] && cellNumbers[rowIndex][colIndex] && (
+                                        <div className="absolute top-0 left-0 text-[0.6rem] m-0.5 text-gray-600">
+                                            {cellNumbers[rowIndex][colIndex]}
+                                        </div>
+                                    )}
                                     {!cell.isBlock && (
-                                        <>
-                                            {cell.number && (
-                                                <div className="absolute top-0 left-0 text-[0.6rem] m-0.5 text-gray-600">
-                                                    {cell.number}
-                                                </div>
-                                            )}
-                                            <input
-                                                type="text"
-                                                ref={(el) => (inputRefs.current[idx] = el)}
-                                                value={cell.input}
-                                                onChange={(e) =>
-                                                    handleChange(rowIndex, colIndex, e.target.value)
-                                                }
-                                                onFocus={() =>
-                                                    setFocusedCell({ row: rowIndex, col: colIndex })
-                                                }
-                                                onKeyDown={(e) => handleKeyDown(e, rowIndex, colIndex)}
-                                                className="w-full h-full text-center uppercase text-lg font-semibold outline-none"
-                                                maxLength={1}
-                                                spellCheck={false}
-                                                aria-describedby={
-                                                    cell.number
-                                                        ? `clue-across-${cell.acrossNumber} clue-down-${cell.downNumber}`
-                                                        : undefined
-                                                }
-                                            />
-                                        </>
+                                        <input
+                                            type="text"
+                                            ref={(el) => (inputRefs.current[idx] = el)}
+                                            value={cell.input}
+                                            onChange={(e) =>
+                                                handleChange(rowIndex, colIndex, e.target.value)
+                                            }
+                                            onFocus={() =>
+                                                setFocusedCell({ row: rowIndex, col: colIndex })
+                                            }
+                                            onKeyDown={(e) => handleKeyDown(e, rowIndex, colIndex)}
+                                            className="w-full h-full text-center uppercase text-lg font-semibold outline-none"
+                                            maxLength={1}
+                                            spellCheck={false}
+                                            aria-describedby={
+                                                cell.number
+                                                    ? `clue-across-${cell.acrossNumber} clue-down-${cell.downNumber}`
+                                                    : undefined
+                                            }
+                                        />
                                     )}
                                 </div>
                             );
@@ -181,11 +244,11 @@ export default function PuzzleViewerPage() {
                 </div>
 
                 {/* Clues */}
-                <div className="flex-1 max-w-md select-none">
+                <div className="flex-1 max-w-md select-none mx-auto">
                     <div className="mb-6">
                         <h3 className="text-xl font-semibold mb-2">Across</h3>
                         <ul className="space-y-1 max-h-[300px] overflow-auto pr-2">
-                            {acrossClues.map((clue) => {
+                            {puzzle.acrossClues.map((clue) => {
                                 const isActive = clue.number === focusedAcross;
                                 return (
                                     <li
@@ -198,8 +261,8 @@ export default function PuzzleViewerPage() {
                                                 (c) => c.acrossNumber === clue.number
                                             );
                                             if (cellPos !== -1) {
-                                                const row = Math.floor(cellPos / grid[0].length);
-                                                const col = cellPos % grid[0].length;
+                                                const row = Math.floor(cellPos / puzzle.grid[0].length);
+                                                const col = cellPos % puzzle.grid[0].length;
                                                 inputRefs.current[cellPos]?.focus();
                                                 setFocusedCell({ row, col });
                                             }
@@ -215,7 +278,7 @@ export default function PuzzleViewerPage() {
                     <div>
                         <h3 className="text-xl font-semibold mb-2">Down</h3>
                         <ul className="space-y-1 max-h-[300px] overflow-auto pr-2">
-                            {downClues.map((clue) => {
+                            {puzzle.downClues.map((clue) => {
                                 const isActive = clue.number === focusedDown;
                                 return (
                                     <li
@@ -228,8 +291,8 @@ export default function PuzzleViewerPage() {
                                                 (c) => c.downNumber === clue.number
                                             );
                                             if (cellPos !== -1) {
-                                                const row = Math.floor(cellPos / grid[0].length);
-                                                const col = cellPos % grid[0].length;
+                                                const row = Math.floor(cellPos / puzzle.grid[0].length);
+                                                const col = cellPos % puzzle.grid[0].length;
                                                 inputRefs.current[cellPos]?.focus();
                                                 setFocusedCell({ row, col });
                                             }
@@ -244,8 +307,8 @@ export default function PuzzleViewerPage() {
                 </div>
             </div>
 
-            {/* Submit Button */}
-            <div className="mt-8 text-center">
+            {/* Submit Button centered below grid and clues */}
+            <div className="w-full flex justify-center mt-10">
                 <button
                     onClick={handleSubmit}
                     className="bg-green-600 hover:bg-green-700 text-white font-medium px-6 py-2 rounded transition"

@@ -7,7 +7,7 @@ export default function LandingPage() {
 
     const handlePlay = () => {
         if (playId.trim()) {
-            navigate(`/view/${encodeURIComponent(playId.trim())}`);
+            navigate(`/play/${encodeURIComponent(playId.trim())}`);
         }
     };
 

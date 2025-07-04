@@ -27,6 +27,7 @@ export default function PreviewPage() {
             <div
                 key={`${r}-${c}`}
                 className={`w-10 h-10 border border-gray-400 relative text-lg font-mono flex items-center justify-center ${isBlock ? 'bg-black' : 'bg-white'}`}
+                style={{ margin: 0, padding: 0 }} // Ensure no gaps
             >
                 {!isBlock && number && (
                     <div className="absolute top-0 left-0 text-[10px] text-gray-600 z-10 leading-none p-0.5">
@@ -51,11 +52,6 @@ export default function PreviewPage() {
         </div>
     );
 
-    // Example: Fetch all puzzles (for testing)
-    // fetch(`${API_BASE}/api/puzzles`)
-    //   .then(res => res.json())
-    //   .then(data => console.log(data));
-
     const handleSave = async () => {
         setSaving(true);
         try {
@@ -73,7 +69,7 @@ export default function PreviewPage() {
             });
             const data = await response.json();
             if (response.ok && data._id) {
-                navigate('/success', { state: { puzzleId: data._id } });
+                navigate(`/success/${data._id}`);
             } else {
                 alert('Failed to save puzzle.');
             }
@@ -90,7 +86,13 @@ export default function PreviewPage() {
 
             <div className="flex flex-col md:flex-row gap-8 mb-10 justify-center">
                 {/* Puzzle Grid */}
-                <div className="grid shadow-md rounded" style={{ gridTemplateColumns: `repeat(${cols}, 2.5rem)` }}>
+                <div
+                    className="grid shadow-md rounded"
+                    style={{
+                        gridTemplateColumns: `repeat(${cols}, 2.5rem)`,
+                        borderCollapse: 'collapse', // Remove gaps between cells
+                    }}
+                >
                     {Array.from({ length: rows }).map((_, r) =>
                         Array.from({ length: cols }).map((_, c) => renderCell(r, c))
                     )}

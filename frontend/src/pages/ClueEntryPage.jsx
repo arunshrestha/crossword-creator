@@ -6,10 +6,14 @@ import { autoNumberGrid } from '../utils/autoNumberGrid';
 
 export default function ClueEntryPage() {
     const navigate = useNavigate();
-    const { title, rows, cols, gridData, setClues } = usePuzzleStore();
+    const { title, rows, cols, gridData, acrossClues: storeAcross, downClues: storeDown, setClues } = usePuzzleStore();
 
-    const [acrossClues, setAcrossClues] = useState([]);
-    const [downClues, setDownClues] = useState([]);
+    const [acrossClues, setAcrossClues] = useState(() =>
+        storeAcross && storeAcross.length > 0 ? storeAcross : []
+    );
+    const [downClues, setDownClues] = useState(() =>
+        storeDown && storeDown.length > 0 ? storeDown : []
+    );
     const [cellNumbers, setCellNumbers] = useState([]);
 
     useEffect(() => {
@@ -19,10 +23,22 @@ export default function ClueEntryPage() {
         }
 
         const numbered = autoNumberGrid(gridData);
-        setAcrossClues(numbered.clues.across);
-        setDownClues(numbered.clues.down);
         setCellNumbers(numbered.cellHasNumber);
+
+        // Only initialize clues if local state is empty
+        if (acrossClues.length === 0 && numbered.clues.across) {
+            setAcrossClues(numbered.clues.across);
+        }
+        if (downClues.length === 0 && numbered.clues.down) {
+            setDownClues(numbered.clues.down);
+        }
+        // eslint-disable-next-line
     }, [gridData, rows, cols, navigate]);
+
+    // Persist clues to store whenever they change
+    useEffect(() => {
+        setClues({ across: acrossClues, down: downClues });
+    }, [acrossClues, downClues, setClues]);
 
     const handleClueChange = (setter, index, newText) => {
         setter((prev) => {
@@ -33,7 +49,6 @@ export default function ClueEntryPage() {
     };
 
     const handlePreview = () => {
-        setClues({ across: acrossClues, down: downClues });
         navigate('/preview');
     };
 

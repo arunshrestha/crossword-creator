@@ -16,7 +16,7 @@ const port = process.env.PORT || 5000;
 // ];
 
 const corsOptions = {
-    origin: ['http://localhost:3000'], // or use process.env.CLIENT_ORIGIN for prod
+    origin: ['http://localhost:3000', process.env.CLIENT_ORIGIN], // or use process.env.CLIENT_ORIGIN for prod
     methods: ['GET', 'POST', 'OPTIONS'],
     allowedHeaders: ['Content-Type'],
 };
@@ -27,16 +27,6 @@ app.options('*', cors(corsOptions)); // handle preflight
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// MongoDB connection
-const uri = process.env.MONGO_URI;
-const clientOptions = {
-    serverApi: {
-        version: '1',
-        strict: true,
-        deprecationErrors: true,
-    },
-};
 
 // Base test route
 app.get('/', (req, res) => {

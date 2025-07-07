@@ -15,6 +15,9 @@ jobs:
       run:
         working-directory: frontend
 
+    env:
+      REACT_APP_API_URL: 'https://crossword-creator.onrender.com'
+
     steps:
       - uses: actions/checkout@v4
 

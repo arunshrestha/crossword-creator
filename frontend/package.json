@@ -2,7 +2,6 @@
   "name": "crossword-creator",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://arunshrestha.github.io/crossword-creator",
   "dependencies": {
     "cra-template": "1.2.0",
     "gh-pages": "^6.3.0",

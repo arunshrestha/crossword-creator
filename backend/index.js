@@ -15,10 +15,24 @@ const port = process.env.PORT || 5000;
 //     'http://localhost:3000'              // for local dev
 // ];
 
+
+// CORS configuration
+const allowedOrigins = [
+    'http://localhost:3000',
+    process.env.CLIENT_ORIGIN
+];
+
 const corsOptions = {
-    origin: ['http://localhost:3000', process.env.CLIENT_ORIGIN], // or use process.env.CLIENT_ORIGIN for prod
+    origin: function (origin, callback) {
+        // allow requests with no origin (like curl, mobile apps)
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
     methods: ['GET', 'POST', 'OPTIONS'],
-    allowedHeaders: ['Content-Type'],
+    allowedHeaders: ['Content-Type']
 };
 
 app.use(cors(corsOptions));

@@ -1,7 +1,9 @@
 import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import usePuzzleStore from '../store/puzzleStore';
 import { autoNumberGrid } from '../utils/autoNumberGrid';
-import { useState } from 'react';
+import { exportToPDF } from '../utils/pdfExport';
+import CrosswordGrid from '../components/Grid/CrosswordGrid';
 
 const API_BASE = process.env.REACT_APP_API_URL;
 
@@ -9,6 +11,7 @@ export default function PreviewPage() {
     const navigate = useNavigate();
     const { title, rows, cols, gridData, acrossClues, downClues } = usePuzzleStore();
     const [saving, setSaving] = useState(false);
+    const [exporting, setExporting] = useState(false);
 
     if (!gridData || !acrossClues || !downClues) {
         return <p className="p-6 text-center">No puzzle data found.</p>;
@@ -17,27 +20,21 @@ export default function PreviewPage() {
     // Generate cell numbers for the preview grid
     const { cellHasNumber } = autoNumberGrid(gridData);
 
-    const renderCell = (r, c) => {
-        const cell = gridData[r][c];
-        const isBlock = cell?.isBlock;
-        const number = cellHasNumber[r][c];
-        const value = cell?.value || '';
+    // Convert data for CrosswordGrid component
+    const grid = gridData.map(row => row.map(cell => cell.value || ''));
+    const blocks = new Set();
+    const numbers = {};
 
-        return (
-            <div
-                key={`${r}-${c}`}
-                className={`w-10 h-10 border border-gray-400 relative text-lg font-mono flex items-center justify-center ${isBlock ? 'bg-black' : 'bg-white'}`}
-                style={{ margin: 0, padding: 0 }} // Ensure no gaps
-            >
-                {!isBlock && number && (
-                    <div className="absolute top-0 left-0 text-[10px] text-gray-600 z-10 leading-none p-0.5">
-                        {number}
-                    </div>
-                )}
-                {!isBlock && value}
-            </div>
-        );
-    };
+    gridData.forEach((row, rIdx) =>
+        row.forEach((cell, cIdx) => {
+            if (cell.isBlock) {
+                blocks.add(`${rIdx}-${cIdx}`);
+            }
+            if (cellHasNumber[rIdx][cIdx]) {
+                numbers[`${rIdx}-${cIdx}`] = cellHasNumber[rIdx][cIdx];
+            }
+        })
+    );
 
     const renderClueList = (label, list) => (
         <div>
@@ -80,22 +77,41 @@ export default function PreviewPage() {
         }
     };
 
+    const handleExportPDF = async () => {
+        setExporting(true);
+        try {
+            const puzzleData = {
+                title: title || 'Crossword Puzzle',
+                grid: grid,
+                numbers: numbers,
+                blocks: blocks,
+                acrossClues: acrossClues,
+                downClues: downClues
+            };
+
+            exportToPDF(puzzleData, title || 'crossword-puzzle');
+        } catch (error) {
+            console.error('Error exporting PDF:', error);
+            alert('Failed to export PDF. Please try again.');
+        } finally {
+            setExporting(false);
+        }
+    };
+
     return (
         <div className="min-h-screen p-6 bg-gray-50">
             <h1 className="text-3xl font-bold mb-6 text-center">{title || 'Puzzle Preview'}</h1>
 
             <div className="flex flex-col md:flex-row gap-8 mb-10 justify-center">
-                {/* Puzzle Grid */}
-                <div
-                    className="grid shadow-md rounded"
-                    style={{
-                        gridTemplateColumns: `repeat(${cols}, 2.5rem)`,
-                        borderCollapse: 'collapse', // Remove gaps between cells
-                    }}
-                >
-                    {Array.from({ length: rows }).map((_, r) =>
-                        Array.from({ length: cols }).map((_, c) => renderCell(r, c))
-                    )}
+                {/* Puzzle Grid - Using player variant */}
+                <div className="flex justify-center">
+                    <CrosswordGrid
+                        grid={grid}
+                        blocks={blocks}
+                        numbers={numbers}
+                        showValues={true}
+                        variant="player" // Add this line
+                    />
                 </div>
 
                 {/* Clues */}
@@ -112,6 +128,13 @@ export default function PreviewPage() {
                     onClick={() => navigate('/clues')}
                 >
                     Edit Clues
+                </button>
+                <button
+                    className="px-5 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 transition disabled:opacity-50"
+                    onClick={handleExportPDF}
+                    disabled={exporting}
+                >
+                    {exporting ? 'Exporting...' : 'Export PDF'}
                 </button>
                 <button
                     className="px-5 py-2 rounded bg-green-600 text-white hover:bg-green-700 transition"

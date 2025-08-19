@@ -1,6 +1,7 @@
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
 import { autoNumberGrid } from '../utils/autoNumberGrid';
+import { exportToPDF } from '../utils/pdfExport';
 
 export default function PuzzlePlayerPage() {
     const { id } = useParams();
@@ -21,6 +22,7 @@ export default function PuzzlePlayerPage() {
     const [focusedCell, setFocusedCell] = useState({ row: null, col: null });
     const inputRefs = useRef([]);
     const [cellNumbers, setCellNumbers] = useState([]);
+    const [exporting, setExporting] = useState(false);
 
     // Fetch puzzle if not in state
     useEffect(() => {
@@ -133,6 +135,52 @@ export default function PuzzlePlayerPage() {
         focusedCell.row,
         focusedCell.col
     );
+
+    const handleExportPDF = async () => {
+        if (!puzzle) return;
+
+        setExporting(true);
+        try {
+            // Convert puzzle grid to the format expected by pdfExport
+            const grid = puzzle.grid.map(row => row.map(cell => cell.value || ''));
+            const blocks = new Set();
+            const numbers = {};
+
+            // Build blocks and numbers from puzzle data
+            puzzle.grid.forEach((row, rIdx) =>
+                row.forEach((cell, cIdx) => {
+                    if (cell.isBlock) {
+                        blocks.add(`${rIdx}-${cIdx}`);
+                    }
+                })
+            );
+
+            // Add cell numbers
+            cellNumbers.forEach((row, rIdx) =>
+                row.forEach((num, cIdx) => {
+                    if (num) {
+                        numbers[`${rIdx}-${cIdx}`] = num;
+                    }
+                })
+            );
+
+            const puzzleData = {
+                title: puzzle.title || 'Crossword Puzzle',
+                grid: grid,
+                numbers: numbers,
+                blocks: blocks,
+                acrossClues: puzzle.acrossClues,
+                downClues: puzzle.downClues
+            };
+
+            exportToPDF(puzzleData, puzzle.title || 'crossword-puzzle');
+        } catch (error) {
+            console.error('Error exporting PDF:', error);
+            alert('Failed to export PDF. Please try again.');
+        } finally {
+            setExporting(false);
+        }
+    };
 
     const handleSubmit = () => {
         // Calculate score
@@ -307,8 +355,15 @@ export default function PuzzlePlayerPage() {
                 </div>
             </div>
 
-            {/* Submit Button centered below grid and clues */}
-            <div className="w-full flex justify-center mt-10">
+            {/* Buttons - Export PDF and Submit */}
+            <div className="w-full flex justify-center gap-4 mt-10">
+                <button
+                    onClick={handleExportPDF}
+                    disabled={exporting}
+                    className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded transition disabled:opacity-50"
+                >
+                    {exporting ? 'Exporting...' : 'Export PDF'}
+                </button>
                 <button
                     onClick={handleSubmit}
                     className="bg-green-600 hover:bg-green-700 text-white font-medium px-6 py-2 rounded transition"

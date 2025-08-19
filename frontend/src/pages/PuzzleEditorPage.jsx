@@ -97,7 +97,6 @@ export default function PuzzleEditorPage() {
                 onClearGrid={handleClearGrid}
                 onUndo={handleUndo}
                 onRedo={handleRedo}
-            // Future props like word count/errors can be added here
             />
 
             <div className="mb-6 w-full max-w-4xl flex justify-center">
@@ -106,6 +105,7 @@ export default function PuzzleEditorPage() {
                         grid={grid}
                         blocks={blocks}
                         onCellClick={handleCellClick}
+                        variant="editor" // Add this line
                     />
                 ) : (
                     <p>Loading grid...</p>
